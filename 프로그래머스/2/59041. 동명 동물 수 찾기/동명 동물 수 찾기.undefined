@@ -1,0 +1,15 @@
+# SELECT name, COUNT(animal_id) AS 'count'
+# FROM animal_ins 
+# WHERE name in (
+#     SELECT name
+#     FROM animal_ins 
+#     GROUP BY name
+#     HAVING count(name) >= 2
+# )
+# ORDER BY name;
+
+SELECT name, count(name) as count
+FROM animal_ins 
+GROUP BY name
+HAVING count(name) >= 2
+ORDER BY name;
