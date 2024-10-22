@@ -1,64 +1,50 @@
 from collections import deque
 
+# 물의 위치를 먼저 퍼뜨리고 고슴도치를 이동시키기 위한 함수 분리
+def bfs():
+    while water_q or hedgehog_q:
+        # 물 먼저 확장
+        water_size = len(water_q)
+        for _ in range(water_size):
+            ci, cj = water_q.popleft()
+            for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                ni, nj = ci + di, cj + dj
+                if 0 <= ni < R and 0 <= nj < C and graph[ni][nj] == '.':
+                    graph[ni][nj] = '*'
+                    water_q.append((ni, nj))
 
-# S의 좌표를 받아와서 시작
-def bfs(si, sj):
-    v[si][sj] = 1
+        # 고슴도치 이동
+        hedgehog_size = len(hedgehog_q)
+        for _ in range(hedgehog_size):
+            ci, cj = hedgehog_q.popleft()
+            for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                ni, nj = ci + di, cj + dj
+                if 0 <= ni < R and 0 <= nj < C:
+                    if graph[ni][nj] == 'D':
+                        return visited[ci][cj]
+                    if graph[ni][nj] == '.':
+                        graph[ni][nj] = 'S'
+                        visited[ni][nj] = visited[ci][cj] + 1
+                        hedgehog_q.append((ni, nj))
 
-    while q:
-        ci, cj = q.popleft()
-
-        # 네 방향 확인에 필요한 dx,dy
-        dx = [0, 1, 0, -1]
-        dy = [1, 0, -1, 0]
-
-        for i in range(4):
-            nx = ci + dx[i]
-            ny = cj + dy[i]
-
-            # 현재 graph값이 S이고 다음 graph값이 . 또는 D 일떄 방문
-            if 0 <= nx < R and 0 <= ny < C and (graph[nx][ny] == '.' or graph[nx][ny] == 'D') and graph[ci][cj] == 'S':
-                v[nx][ny] = v[ci][cj] + 1
-                graph[nx][ny] = 'S'
-                q.append((nx, ny))
-
-            # 현재 graph값이 *이고 다음 graph값이 . 또는 S 일때 방문
-            elif 0 <= nx < R and 0 <= ny < C and (graph[nx][ny] == '.' or graph[nx][ny] == 'S') and graph[ci][
-                cj] == '*':
-                graph[nx][ny] = '*'
-                q.append((nx, ny))
+    return 'KAKTUS'
 
 
-if __name__ == '__main__':
-    R, C = map(int, input().split())
-    graph = [list(map(str, input().strip())) for _ in range(R)]
+R, C = map(int, input().split())
+graph = [list(input().strip()) for _ in range(R)]
 
-    v = [[0] * C for _ in range(R)]
-    q = deque()
+water_q = deque()
+hedgehog_q = deque()
+visited = [[0] * C for _ in range(R)]
 
-    # 비버 집 위치 저장
-    for i in range(R):
-        for j in range(C):
-            if graph[i][j] == 'D':
-                c, d = i, j
+# 비버 집, 고슴도치, 물의 위치 저장
+for i in range(R):
+    for j in range(C):
+        if graph[i][j] == 'S':
+            hedgehog_q.append((i, j))
+            visited[i][j] = 1
+        elif graph[i][j] == '*':
+            water_q.append((i, j))
 
-    # 고슴도치 위치 찾고 q에 저장
-    for i in range(R):
-        for j in range(C):
-            if graph[i][j] == 'S':
-                x, y = i, j
-                q.append((x, y))
-
-    # 물의 위치 찾고 q에 저장
-    for i in range(R):
-        for j in range(C):
-            if graph[i][j] == '*':
-                q.append((i, j))
-
-    bfs(x, y)
-
-    # bfs종료후에 v배열확인 후 원하는 값 출력
-    if v[c][d]:
-        print(v[c][d] - 1)
-    else:
-        print('KAKTUS')
+result = bfs()
+print(result)
