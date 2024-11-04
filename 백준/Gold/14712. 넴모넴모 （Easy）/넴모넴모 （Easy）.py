@@ -1,10 +1,10 @@
 N, M = map(int, input().split())
-arr = [[0] * (M + 1) for _ in range(N + 1)]
+arr = [[0] * M for _ in range(N)]
 
 def dfs(cnt):
     global res
-    m = cnt // M + 1
-    n = cnt % M + 1
+    m = cnt // M
+    n = cnt % M
 
     # cnt가 N * M이면 마지막 블록에 도달했다는 뜻
     if cnt == N * M:
