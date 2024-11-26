@@ -1,35 +1,36 @@
 from collections import defaultdict
+from collections import deque
 
-# v : 시작 정점
-def dfs(v):
-    # 현재 정점은 방문했다고 처리
-    visited[v] = True
+def bfs():
+    global res
+    queue = deque()
 
-    # 인접한 정점에 대해서 다시 dfs 실행
-    for neighbor in graph[v]:
-        if not visited[neighbor]:
-            dfs(neighbor)
+    for v in range(1, V+1):
+        if pre[v] == 0:
+            queue.append(v)
 
-    # 여기까지 실행했으면, 가장 안 쪽까지 파고들었다
-    # 여기까지 왔다는 건? 이제 인접한 정점이 없다는 뜻
-    res.append(v)
+    while queue:
+        current = queue.popleft()
+        res.append(current)
+        for child in graph[current]:
+            pre[child] -= 1
+            if pre[child] == 0:
+                queue.append(child)
 
-for test_case in range(1, 11):
-    vcnt, ecnt = map(int, input().split())
+T = 10
+for test_case in range(1, T+1):
+    V, E = map(int, input().split())
     edges = list(map(int, input().split()))
-
-    # 사이클이 없는 방향 그래프 (DAG)
     graph = defaultdict(list)
-    for i in range(ecnt):
-        graph[edges[2*i]].append(edges[2*i + 1])
 
-    # dfs 방문처리를 위한 방문 리스트 변수
-    visited = [False] * (vcnt + 1)
+    pre = [0] * (V+1)
     res = []
 
-    # 모든 정점에 대해 dfs 실행 (방문하지 않은 정점에 대해서만)
-    for v in range(1, vcnt + 1):
-        if not visited[v]:
-            dfs(v)
+    for i in range(E):
+        a, b = edges[i * 2], edges[i * 2 + 1]
+        graph[a].append(b)
+        pre[b] += 1
 
-    print(f"#{test_case}", *(res[::-1]))
+    bfs()
+
+    print(f"#{test_case}", *res)
